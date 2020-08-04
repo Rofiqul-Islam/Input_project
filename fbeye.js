@@ -47,6 +47,18 @@ function checkLoginState() {               // Called when a person is finished w
     });
 }
 
+function getFeed(){
+    FB.api(
+        "/{page-id}/feed",
+        function (response) {
+            console.log(response);
+          if (response && !response.error) {
+            /* handle the result */
+          }
+        }
+    );
+}
+
 
 window.fbAsyncInit = function () {
     FB.init({
@@ -69,5 +81,6 @@ function testAPI() {                      // Testing Graph API after login.  See
         console.log('Successful login for: ' + response.name);
         document.getElementById('status').innerHTML =
             'Thanks for logging in, ' + response.name + '!';
+        getFeed();
     });
 }
