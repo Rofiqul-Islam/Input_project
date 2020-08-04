@@ -48,6 +48,7 @@ function checkLoginState() {               // Called when a person is finished w
 }
 
 function getFeed(){
+    console.log("reached here");
     FB.api(
         "/{page-id}/feed",
         function (response) {
