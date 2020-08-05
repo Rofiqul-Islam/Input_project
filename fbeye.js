@@ -1,87 +1,86 @@
-$(document).ready(function () {
-    console.log("ready");
-    $("#tab1").show();
-    $("#tab2").hide();
-    $("#tab3").hide();
-});
+currentTab = 0;
+tabCount = 4;
+tabOrder = ["#summary-tab-btn","#timeline-tab-btn","#feed-tab-btn","#post-tab-btn"];
+
+const tabOptions = {
+    SUMMARY: 1,
+    TIMELINE: 2,
+    NEWSFEED: 3,
+    POST: 4
+
+}
+var selectedTab = tabOptions.SUMMARY;
 
 $(document).ready(function () {
-    $("#tab1").show();
-    $("#tab2").hide();
-    $("#tab3").hide();
+    $("#summary-tab-btn").click();
+    currentTab = 0;
 });
 
-$("#tab1-btn").click(function () {
-    $("#tab1").show();
-    $("#tab2").hide();
-    $("#tab3").hide();
-});
 
-$("#tab2-btn").click(function () {
-    $("#tab1").hide();
-    $("#tab2").show();
-    $("#tab3").hide();
-});
-
-$("#tab3-btn").click(function () {
-    $("#tab1").hide();
-    $("#tab2").hide();
-    $("#tab3").show();
-});
-
-function statusChangeCallback(response) {  // Called with the results from FB.getLoginStatus().
-    console.log('statusChangeCallback');
-    console.log(response);                   // The current login status of the person.
-    if (response.status === 'connected') {   // Logged into your webpage and Facebook.
-        testAPI();
-    } else {                                 // Not logged into your webpage or we are unable to tell.
-        document.getElementById('status').innerHTML = 'Please log ' +
-            'into this webpage.';
+$(document).keydown(function(event) {
+    console.log(event.key);
+    if(event.key == "ArrowRight"){
+        currentTab = (currentTab+1)%tabCount;
+        console.log(currentTab);
+        $(tabOrder[currentTab]).click();
+    }else if(event.key == "ArrowLeft"){
+        currentTab = (currentTab-1+tabCount)%tabCount;
+        console.log(currentTab);
+        $(tabOrder[currentTab]).click();
     }
+    
+});
+
+
+$("#summary-tab-btn").click(function () {
+    resetTabs();
+    $("#summary-tab").show();
+    read("summary");
+    selectedTab = tabOptions.SUMMARY;
+});
+
+$("#timeline-tab-btn").click(function () {
+    resetTabs();
+    $("#timeline-tab").show();
+    read("timeline")
+    loadTimeline();
+    selectedTab = tabOptions.TIMELINE;
+});
+
+$("#feed-tab-btn").click(function () {
+    resetTabs();
+    flag = false;
+    $("#feed-tab").show();
+    read("News feed");
+    loadNewsFeed();
+    selectedTab = tabOptions.NEWSFEED;
+});
+
+$("#post-tab-btn").click(function () {
+    resetTabs();
+    $("#post-tab").show();
+    read("Post");
+    selectedTab = tabOptions.POST;
+    read("write something to post and press ENTER to upload")
+    $("#post-text-field").focus();
+
+});
+
+
+function resetTabs() {
+    $(".tab").hide();
+    cancelRead();
+    contentIndexOfIndividualTab = 0;
 }
 
-
-function checkLoginState() {               // Called when a person is finished with the Login Button.
-    FB.getLoginStatus(function (response) {   // See the onlogin handler
-        statusChangeCallback(response);
-    });
+function read(msg) {
+	window.speechSynthesis.speak(new SpeechSynthesisUtterance(msg));
 }
 
-function getFeed(){
-    console.log("reached here");
-    FB.api(
-        "/{page-id}/feed",
-        function (response) {
-            console.log(response);
-          if (response && !response.error) {
-            /* handle the result */
-          }
-        }
-    );
+function cancelRead() {
+    window.speechSynthesis.cancel();
 }
 
-
-window.fbAsyncInit = function () {
-    FB.init({
-        //appId: '926578834514927',
-		appId: '257976948032383',
-        cookie: true,                     // Enable cookies to allow the server to access the session.
-        xfbml: true,                     // Parse social plugins on this webpage.
-        version: 'v7.0'           // Use this Graph API version for this call.
-    });
-
-
-    FB.getLoginStatus(function (response) {   // Called after the JS SDK has been initialized.
-        statusChangeCallback(response);        // Returns the login status.
-    });
-};
-
-function testAPI() {                      // Testing Graph API after login.  See statusChangeCallback() for when this call is made.
-    console.log('Welcome!  Fetching your information.... ');
-    FB.api('/me', function (response) {
-        console.log('Successful login for: ' + response.name);
-        document.getElementById('status').innerHTML =
-            'Thanks for logging in, ' + response.name + '!';
-        getFeed();
-    });
+function beep() {
+	new Audio('http://www.soundjay.com/button/beep-07.wav').play();	
 }
